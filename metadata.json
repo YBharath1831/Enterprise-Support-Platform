@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Support Desk",
+  "description": "Multi-channel AI support platform with Customer Portal, Live RAG Chat Agent, and Admin Ticket Management Dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

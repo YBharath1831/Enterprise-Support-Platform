@@ -1,0 +1,113 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "backendBaseUrl": {
+        "type": "string",
+        "defaultValue": "https://fde-backend-api.niceforest-3c4b30ba.eastus.azurecontainerapps.io",
+        "metadata": { "description": "Base URL of fde-backend-api - same one the frontend uses (VITE_API_BASE_URL)." }
+      },
+      "emailWebhookSecret": {
+        "type": "securestring",
+        "metadata": { "description": "Must exactly match EMAIL_INTAKE_WEBHOOK_SECRET on the Container App. Set this as a secure parameter when deploying, never hardcode it here." }
+      }
+    },
+    "triggers": {
+      "When_a_new_email_arrives": {
+        "type": "ApiConnection",
+        "recurrence": { "frequency": "Minute", "interval": "1" },
+        "inputs": {
+          "host": {
+            "connection": { "referenceName": "outlook" }
+          },
+          "method": "get",
+          "path": "/v3/Mail/OnNewEmail",
+          "queries": {
+            "folderPath": "Inbox",
+            "importance": "Any",
+            "fetchOnlyWithAttachment": false,
+            "includeAttachments": false
+          }
+        },
+        "splitOn": "@triggerBody()?['value']"
+      }
+    },
+    "actions": {
+      "Html_to_text": {
+        "type": "Compose",
+        "inputs": "@replace(replace(triggerBody()?['Body'], decodeUriComponent('%3Cbr%3E'), decodeUriComponent('%0A')), decodeUriComponent('%3Cbr%2F%3E'), decodeUriComponent('%0A'))",
+        "runAfter": {}
+      },
+      "Call_backend_pipeline": {
+        "type": "Http",
+        "inputs": {
+          "method": "POST",
+          "uri": "@{parameters('backendBaseUrl')}/api/email-intake",
+          "headers": {
+            "Content-Type": "application/json",
+            "X-Webhook-Secret": "@{parameters('emailWebhookSecret')}"
+          },
+          "body": {
+            "from_email": "@{triggerBody()?['From']}",
+            "subject": "@{triggerBody()?['Subject']}",
+            "body": "@{outputs('Html_to_text')}"
+          }
+        },
+        "runAfter": {
+          "Html_to_text": ["Succeeded"]
+        }
+      },
+      "Parse_pipeline_result": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@body('Call_backend_pipeline')",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "ticket_id": { "type": "string" },
+              "ticket_number": { "type": "string" },
+              "request_type": { "type": "string" },
+              "resolution": { "type": "string" },
+              "confidence": { "type": "integer" },
+              "status": { "type": "string" },
+              "reply_subject": { "type": "string" }
+            }
+          }
+        },
+        "runAfter": {
+          "Call_backend_pipeline": ["Succeeded"]
+        }
+      },
+      "Reply_to_email": {
+        "type": "ApiConnection",
+        "inputs": {
+          "host": {
+            "connection": { "referenceName": "outlook" }
+          },
+          "method": "post",
+          "path": "/v3/Mail/@{encodeURIComponent(triggerBody()?['Id'])}/Reply",
+          "body": {
+            "Comment": "Hi,\n\nThanks for reaching out. Your ticket number is @{body('Parse_pipeline_result')?['ticket_number']}.\n\n@{body('Parse_pipeline_result')?['resolution']}\n\n— Umashankar Support Agent (Automated)"
+          }
+        },
+        "runAfter": {
+          "Parse_pipeline_result": ["Succeeded"]
+        }
+      }
+    },
+    "outputs": {}
+  },
+  "parameters": {
+    "$connections": {
+      "value": {
+        "outlook": {
+          "connectionId": "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.Web/connections/outlook",
+          "connectionName": "outlook",
+          "id": "/subscriptions/<SUBSCRIPTION_ID>/providers/Microsoft.Web/locations/<REGION>/managedApis/outlook"
+        }
+      }
+    }
+  },
+  "_note": "Using the 'Outlook.com' connector (managed API id 'outlook'), not 'Office 365 Outlook', because the receiving mailbox (umashankarkh@outlook.com) is a personal Microsoft account, not a work/school Entra mailbox. This file is a reference only - build it live in the Logic App Designer, which handles the connector version/paths automatically; don't paste this JSON in unless you're comfortable reconciling it against whatever the designer generates."
+}

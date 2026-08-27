@@ -1,0 +1,226 @@
+[
+  {
+    "id": "kb-001",
+    "category": "camera",
+    "request_type": "incident",
+    "title": "Camera not detected / black screen in video calls",
+    "symptoms": "User reports camera shows black screen or 'no camera detected' in the app during video calls.",
+    "resolution_steps": [
+      "Confirm no other app (Zoom, Teams, etc.) is currently using the camera.",
+      "Check OS-level camera permission is granted to the app.",
+      "Ask user to reconnect/replug external webcam if applicable.",
+      "Have user update or reinstall camera driver.",
+      "Restart the app and retest."
+    ],
+    "policy_notes": "Standard troubleshooting incident. Escalate to hardware support only if driver reinstall fails.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-002",
+    "category": "browser",
+    "request_type": "incident",
+    "title": "Web portal not loading / blank page in browser",
+    "symptoms": "User reports the support portal loads a blank page or spinner that never resolves.",
+    "resolution_steps": [
+      "Ask which browser and version is being used.",
+      "Have user clear cache/cookies for the site.",
+      "Try in an incognito/private window to rule out extensions.",
+      "Confirm the browser is on the supported list (latest 2 versions of Chrome, Edge, Firefox, Safari).",
+      "If unresolved, capture browser console errors and escalate to engineering."
+    ],
+    "policy_notes": "Escalate to engineering with console logs if not resolved in 2 troubleshooting turns.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-003",
+    "category": "password_reset",
+    "request_type": "service_request",
+    "title": "Password reset request / reset email not received",
+    "symptoms": "User requests a password reset, or the reset email/link never arrived or has expired.",
+    "resolution_steps": [
+      "Confirm the email address on file matches the one used to request reset.",
+      "Ask user to check spam/junk folder.",
+      "Resend reset link (valid for 30 minutes).",
+      "If still failing, manually verify identity via account security details and issue a temporary password.",
+      "Force password change on next login."
+    ],
+    "policy_notes": "Identity must be verified via at least two account details before issuing a manual reset.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-004",
+    "category": "app_crash",
+    "request_type": "incident",
+    "title": "Application crashes on launch or during use",
+    "symptoms": "App crashes immediately on open, or crashes intermittently during normal use.",
+    "resolution_steps": [
+      "Confirm app version and OS version.",
+      "Ask user to update to latest app version.",
+      "Have user clear app cache/local storage.",
+      "Collect crash log if available.",
+      "If crash persists after update, escalate to engineering with crash log and repro steps."
+    ],
+    "policy_notes": "If the crash may have caused data loss, route to Critic agent for verification before confirming the fix - data-loss claims need review, not just the crash itself.",
+    "confidence_tag": "human_review_if_data_loss"
+  },
+  {
+    "id": "kb-005",
+    "category": "connectivity",
+    "request_type": "incident",
+    "title": "Intermittent disconnects / 'connection lost' errors",
+    "symptoms": "User experiences frequent disconnects or 'connection lost' errors during use.",
+    "resolution_steps": [
+      "Confirm user's network connection is stable (ask them to test another site/app).",
+      "Check status page for known outages in user's region.",
+      "Have user switch networks (WiFi vs mobile data) to isolate the issue.",
+      "If status page shows an active incident, share ETA and link, do not troubleshoot further.",
+      "If no known incident and issue persists, escalate to network engineering."
+    ],
+    "policy_notes": "Standard connectivity incident. Link the status page directly rather than promising a fix timeline yourself.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-006",
+    "category": "install_failure",
+    "request_type": "incident",
+    "title": "Installation fails or gets stuck",
+    "symptoms": "Installer fails with an error code or hangs partway through installation.",
+    "resolution_steps": [
+      "Capture the exact error code shown.",
+      "Confirm OS meets minimum system requirements.",
+      "Ask user to run installer as administrator / with elevated permissions.",
+      "Have user temporarily disable antivirus/firewall during install, then re-enable after.",
+      "If error code matches a known issue, apply the documented fix; otherwise escalate to engineering."
+    ],
+    "policy_notes": "Standard install-failure incident, not a new-software request - see kb-012 for that flow.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-007",
+    "category": "email_sync",
+    "request_type": "incident",
+    "title": "Email/calendar sync not working",
+    "symptoms": "User's email or calendar integration is not syncing new items.",
+    "resolution_steps": [
+      "Confirm the integration shows as 'connected' in account settings.",
+      "Ask user to disconnect and reconnect the integration.",
+      "Check for expired OAuth token and prompt re-authentication.",
+      "Verify sync frequency settings match user expectation (some plans sync every 15 min, not real-time).",
+      "Escalate to integrations team if reconnect does not resolve."
+    ],
+    "policy_notes": "Note plan-tier sync frequency limits before promising real-time sync.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-008",
+    "category": "2fa",
+    "request_type": "incident",
+    "title": "Two-factor authentication locked out / lost authenticator device",
+    "symptoms": "User cannot complete 2FA login, lost their authenticator device, or lost backup codes.",
+    "resolution_steps": [
+      "Verify identity using at least two independent account details.",
+      "Check if user has any unused backup codes on file.",
+      "If identity is verified, temporarily disable 2FA and prompt re-enrollment.",
+      "Advise user to save new backup codes securely after re-enrollment.",
+      "Log the 2FA reset event for security audit."
+    ],
+    "policy_notes": "GUARDRAIL: Identity verification is mandatory before any 2FA reset. This is a security-sensitive action - route to human approval if identity verification is inconclusive.",
+    "confidence_tag": "human_review_required"
+  },
+  {
+    "id": "kb-009",
+    "category": "file_upload",
+    "request_type": "incident",
+    "title": "File upload fails or times out",
+    "symptoms": "User cannot upload a file, upload times out, or fails with an error.",
+    "resolution_steps": [
+      "Confirm file size against the plan's upload limit.",
+      "Confirm file type is supported.",
+      "Ask user to test with a smaller file to isolate a size/network issue.",
+      "Check for known outage on the upload/storage service.",
+      "Escalate to engineering if file meets all requirements and still fails."
+    ],
+    "policy_notes": "Mention plan upgrade only if user is consistently hitting size limits (informational, not a sales pitch).",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-010",
+    "category": "mic_audio",
+    "request_type": "incident",
+    "title": "Microphone not working / no audio detected",
+    "symptoms": "User's microphone is not picking up audio during calls or recordings.",
+    "resolution_steps": [
+      "Confirm correct microphone is selected in app audio settings.",
+      "Check OS-level microphone permission is granted to the app.",
+      "Ask user to test the mic in another app to isolate hardware vs software issue.",
+      "Have user update audio drivers.",
+      "Escalate to hardware support if issue persists across apps."
+    ],
+    "policy_notes": "Standard troubleshooting incident.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-011",
+    "category": "vpn",
+    "request_type": "incident",
+    "title": "VPN connection fails or blocks access to the app",
+    "symptoms": "User cannot access the app while connected to a corporate VPN, or the app is unreachable through VPN.",
+    "resolution_steps": [
+      "Confirm whether the issue only occurs while VPN is active.",
+      "Check if the user's VPN egress IP is on any regional block list.",
+      "Advise user to try split-tunneling if their VPN client supports it.",
+      "Provide the list of domains/ports that must be allow-listed by their corporate IT.",
+      "Escalate to network engineering if app remains unreachable after allow-listing."
+    ],
+    "policy_notes": "This is frequently a corporate IT allow-list issue, not a service defect - not a new-access request, see kb-013 for that flow.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-012",
+    "category": "software_install_request",
+    "request_type": "service_request",
+    "title": "Request to install or license new software",
+    "symptoms": "User requests a new approved application, IDE, or licensed tool be installed or activated on their machine.",
+    "resolution_steps": [
+      "Confirm the requested software is on the pre-approved software catalog.",
+      "If pre-approved, provision a license seat and push the install via device management.",
+      "If not on the catalog, route to IT for manager approval before provisioning.",
+      "Confirm successful install with the user.",
+      "Log the license assignment for the software asset inventory."
+    ],
+    "policy_notes": "Pre-approved catalog software can be auto-provisioned. Anything outside the catalog requires manager approval before install.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-013",
+    "category": "vpn_access_request",
+    "request_type": "service_request",
+    "title": "Request new VPN access for a user",
+    "symptoms": "A new hire, contractor, or existing employee requests VPN access to the corporate network for the first time.",
+    "resolution_steps": [
+      "Confirm the requester's employment/contractor status and manager.",
+      "Confirm which network segments they need access to based on their role.",
+      "Provision the VPN profile and credentials scoped to the approved segments.",
+      "Send setup instructions and the allow-listed domains/ports.",
+      "Log the access grant for the security audit trail."
+    ],
+    "policy_notes": "Standard provisioning request for role-appropriate access.",
+    "confidence_tag": "auto_resolve"
+  },
+  {
+    "id": "kb-014",
+    "category": "privileged_access_request",
+    "request_type": "service_request",
+    "title": "Request for elevated / admin system access",
+    "symptoms": "User requests admin rights, root/sudo access, or elevated permissions on a system or environment.",
+    "resolution_steps": [
+      "Confirm the requester's role and business justification for elevated access.",
+      "Confirm manager or system-owner approval is on file.",
+      "Scope the grant to the minimum permissions and time window needed.",
+      "Provision access and set an expiry/review date.",
+      "Log the privileged-access grant for the security audit trail."
+    ],
+    "policy_notes": "GUARDRAIL: Elevated/admin access may never be auto-granted by the Resolver agent. All privileged-access requests require Critic sign-off and explicit human approval, regardless of Critic confidence.",
+    "confidence_tag": "human_review_required"
+  }
+]
